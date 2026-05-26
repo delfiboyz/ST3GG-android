@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "ST3GG Mobile"

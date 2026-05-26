@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ST3GG Mobile</title>
+    <style>
+        :root {
+            --primary: #2196F3;
+            --accent: #FF4081;
+            --bg: #F5F5F5;
+            --card: #FFFFFF;
+            --text: #212121;
+            --text-secondary: #757575;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        h1 { margin: 0; font-size: 24px; }
+        p { color: var(--text-secondary); line-height: 1.5; }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-bottom: 10px;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-accent { background-color: var(--accent); color: white; }
+        .btn-outline { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+        .btn-success { background-color: #4CAF50; color: white; }
+        .tip { font-size: 12px; color: var(--text-secondary); margin-top: 5px; font-style: italic; }
+
+        .btn:active { opacity: 0.8; }
+
+        .hidden { display: none !important; }
+
+        .preview-img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-family: inherit;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        #loading {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .success-icon { color: #4CAF50; font-size: 48px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ST3GG Mobile</h1>
+    </div>
+
+    <div class="container">
+        
+        <!-- Home Screen -->
+        <div id="home-screen" class="screen">
+            <div class="card">
+                <img src="../../res/mipmap-xhdpi/ic_launcher.png" style="width: 80px; margin-bottom: 15px;" alt="Logo" onerror="this.src='https://img.icons8.com/color/96/000000/dinosaur.png'">
+                <h2>Halo! 👋</h2>
+                <p>Sembunyikan pesan rahasia di dalam gambar dengan mudah dan aman.</p>
+            </div>
+            
+            <button id="btn-go-encode" class="btn btn-primary">Sembunyikan Pesan</button>
+            <button id="btn-go-decode" class="btn btn-outline">Buka Pesan Rahasia</button>
+        </div>
+
+        <!-- Encode Screen -->
+        <div id="encode-screen" class="screen hidden">
+            <button id="btn-back-home" style="background: none; border: none; color: var(--primary); padding: 0; margin-bottom: 15px; font-weight: bold; cursor: pointer;">← Kembali</button>
+            <div class="card">
+                <h3>1. Pilih Gambar</h3>
+                <p>Pilih gambar dari galeri Anda sebagai wadah.</p>
+                <input type="file" id="image-input-encode" accept="image/*,.stg" class="hidden">
+                <button onclick="document.getElementById('image-input-encode').click()" class="btn btn-outline">Pilih Gambar</button>
+                <img id="encode-preview" class="preview-img hidden">
+            </div>
+
+            <div class="card">
+                <h3>2. Masukkan Pesan</h3>
+                <textarea id="secret-text" placeholder="Tuliskan pesan rahasia Anda di sini..."></textarea>
+                <button id="btn-start-encode" class="btn btn-primary">Proses & Sembunyikan</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen hidden">
+            <div class="card">
+                <div class="success-icon">✓</div>
+                <h3>Berhasil!</h3>
+                <p>Pesan Anda telah disembunyikan. Gambar ini terlihat normal, tapi isinya rahasia.</p>
+                <img id="result-image" class="preview-img">
+                <button id="btn-save" class="btn btn-primary">Simpan ke Galeri</button>
+                <button id="btn-share-safe" class="btn btn-success">Bagikan Aman (WhatsApp)</button>
+                <p class="tip">Gunakan "Bagikan Aman" agar pesan tidak rusak saat dikirim lewat WhatsApp.</p>
+                <button id="btn-share" class="btn btn-outline">Bagikan Biasa (Gambar)</button>
+                <button id="btn-done" class="btn btn-outline" style="border: none;">Selesai</button>
+            </div>
+        </div>
+
+        <!-- Decode Screen -->
+        <div id="decode-screen" class="screen hidden">
+            <button id="btn-back-home2" style="background: none; border: none; color: var(--primary); padding: 0; margin-bottom: 15px; font-weight: bold; cursor: pointer;">← Kembali</button>
+            <div class="card">
+                <h3>Pilih Gambar Stego</h3>
+                <p>Pilih gambar yang berisi pesan rahasia.</p>
+                <input type="file" id="image-input-decode" accept="image/*,.stg" class="hidden">
+                <button onclick="document.getElementById('image-input-decode').click()" class="btn btn-outline">Pilih Gambar</button>
+                <img id="decode-preview" class="preview-img hidden">
+                <button id="btn-start-decode" class="btn btn-primary">Buka Pesan</button>
+            </div>
+        </div>
+
+        <!-- Decoded Message Screen -->
+        <div id="decoded-screen" class="screen hidden">
+            <div class="card">
+                <h3>Pesan Ditemukan! 🔓</h3>
+                <div id="decoded-text" style="background: #f9f9f9; padding: 15px; border-radius: 8px; text-align: left; white-space: pre-wrap; margin: 15px 0; border: 1px solid #eee;"></div>
+                <button onclick="showScreen('home-screen')" class="btn btn-primary">Kembali ke Beranda</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="loading" class="hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="steg-core.js"></script>
+    <script src="f5stego-lib.js"></script>
+    <script src="mobile-ui.js"></script>
+</body>
+</html>
